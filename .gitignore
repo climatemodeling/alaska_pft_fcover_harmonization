@@ -1,3 +1,6 @@
 data/
+scripts/snap_esa/Sentinel1
+scripts/snap_esa/Sentinel1_Preprocessed
+scripts/snap_esa/ASTER_Alaska_DEM.tif
 *.ipynb_checkpoints*
 *__pycache__*
