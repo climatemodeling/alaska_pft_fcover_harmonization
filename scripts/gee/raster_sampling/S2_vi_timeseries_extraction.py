@@ -9,43 +9,69 @@ import geemap
 import os
 import time
 from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
+import geopandas as gpd
 import pandas as pd
 import numpy as np
-from mpi4py import MPI
-import json
-import pprint
-
-comm = MPI.COMM_WORLD
-size = comm.Get_size()
-rank = comm.Get_rank()
 
 ##########################################################################################
 # Set Parameters
 ##########################################################################################
 
-# cloud filter params
-CLOUD_FILTER = 90
-
 # area of interest params
-GEOJSON_PATH = ''
-COUNTRY = ''
-STATE = 'AK' # abbreviated for HUC watershed
+# choose bounding area format ('STATE', 'COUNTRY', 'BBOX', 'HUC', 'SHP'):
+ROI = 'SHP'
+
+# if ROI = BBOX or SHP (path to .geojson or .shp, otherwise ''):
+b = '/mnt/poseidon/remotesensing/arctic/data/vectors/supplementary/tundra_alaska'
+IN_PATH = f'{b}/tundra_alaska.shp'
+# if ROI = STATE or COUNTRY (administrative boundaries, otherwise None):
+COUNTRY = None
+# if ROI = HUC, state abbreviation for HUC, if STATE, fulls state name:
+STATE = None # 'AK' 
+# if ROI = HUC (list of HUC6 units):
+HUCLIST = None # must be list: ['190604', '190603', '190602']
+
+##########################################################################################
+
+# buffer around point to find median of intersecting pixel values
+FCOVER_PATH = '/mnt/poseidon/remotesensing/arctic/data/training/Test_05/fcover'
 POINTBUFFER = 30 # meters
-ROI = 'HUC' # STATE, COUNTRY, BBOX, or HUC
-HUCLIST = ['190604', '190603', '190602'] # must be list
-DIR_PATH = '/mnt/poseidon/remotesensing/arctic/data/training/Test_03/med_band_2019/med_band_data_summer'
-if not os.path.isdir(DIR_PATH):
-    os.mkdir(DIR_PATH)
+PC = 'child'
+
+##########################################################################################
+
+##########################################################################################
+
+# output file
+dp = '/mnt/poseidon/remotesensing/arctic/data/training/Test_05/temp'
+DIR_PATH = f'{dp}/raw_ndvi_{PC}_{POINTBUFFER}m'
+try:
+    if os.path.isdir(DIR_PATH) == False:
+        os.mkdir(DIR_PATH)
+except Exception as e:
+    pass
+
+##########################################################################################
 
 # data Information
-IDCOL = 'UID'
-SCALE = 10
-BANDS = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8A', 'B9', 'B11', 'B12']
-start_date = date(2019, 6, 1)# Year-Month-Day
-end_date = date(2019, 8, 31) # Year-Month-Day minus 5 for even intervals (6 days for 2020)
-TIMESTEP = None # months, days, or None
-DAYS = '' # if TIMESTEP = days
-MONTHS = '' # if TIMESTEP = months
+IDCOL = 'Site Code'
+SCALE = 10 # (int) scale in meters
+BANDS = ['B4', 'B8'] # (list) band list
+VI = 'ndvi'
+NORM_DIFF_BANDS = ['B8', 'B4']
+start_date = date(2019, 1, 1) # Y-M-D (2019, 1, 1)
+end_date = date(2019, 12, 31) # Y-M-D minus 5 for even 'days' intervals (6 days for 2020)
+TIMESTEP = 'months' # (str) 'months', 'days', or None
+DAYS = '' # (int) if TIMESTEP = days
+MONTHS = 12 # (int) if TIMESTEP = 'months': years * 12
+
+# create timestamp directories within each huc (rank)
+PATH = f'{DIR_PATH}/{VI.upper()}'
+if os.path.isdir(PATH):
+    pass
+else:
+    os.mkdir(PATH)
 
 ##########################################################################################
 # Create ee_to_df function for exporting
@@ -145,28 +171,6 @@ else:
     print("Invalid TIMESTEP selection. Use 'days', 'months', or None.")
 
 ##########################################################################################
-# Set Ranks by Number of HUCS
-##########################################################################################
-
-# create huc (rank) directories
-allhucs = np.array(HUCLIST)
-allhucs = np.array_split(allhucs, size) # split array into x pieces
-for r in range(len(allhucs)):
-    if r == rank:
-        CURRENTROI = HUCLIST[r] # select object from list
-        PATH = f'{DIR_PATH}/{CURRENTROI}'
-    else:
-        pass
-
-print('RANK:', rank, CURRENTROI, flush = True)
-
-# create timestamp directories within each huc (rank)
-if os.path.isdir(PATH):
-    pass
-else:
-    os.mkdir(PATH)
-
-##########################################################################################
 # Set GEE Vector Bounds
 ##########################################################################################
 
@@ -181,14 +185,18 @@ elif ROI == 'COUNTRY':
                         .filterMetadata('ADM0_NAME', 'equals', COUNTRY))
 	
 elif ROI == 'BBOX':
-	grid_location_ee = geemap.geojson_to_ee(GEOJSON_PATH)
+	grid_location_ee = geemap.geojson_to_ee(IN_PATH)
     
 elif ROI == 'HUC':
     grid_location_ee = (ee.FeatureCollection("USGS/WBD/2017/HUC06")
-                        .filter(ee.Filter.inList('huc6', [CURRENTROI])))
+                        .filter(ee.Filter.inList('huc6', HUCLIST)))
+    
+elif ROI == 'SHP':
+    geodataframe = gpd.read_file(IN_PATH)
+    grid_location_ee = geemap.geopandas_to_ee(geodataframe)
     
 else:
-    print('Invalid region of interest. Choose STATE, COUNTRY, or HUC')
+    print('Invalid region of interest. Check STATE, COUNTRY, HUC')
     quit
 
 ##########################################################################################
@@ -196,89 +204,81 @@ else:
 ##########################################################################################
 
 ##########################################################################################
-# AK-AVA Turboveg post-2000
-
-# load observations
-di = '/mnt/poseidon/remotesensing/arctic/data/training/Test_03/'
-fi = 'AKAVA_pft_fcover_01.csv'
-obs_data = pd.read_csv(di + fi)
+# AKVEG test 05
+fi = f'VEG_fcover_{PC}.csv'
+obs_data = pd.read_csv(f"{FCOVER_PATH}/{fi}")
 
 # extract geometry and unique ID
-ava_geom = obs_data[['Latitude (decimal degrees)', 
-                     'Longitude (decimal degrees)', 
-                     'Releve number']]
-
-ava_geom.columns = ['Lat', 'Lon', 'UID']
+akv_geom = obs_data[['latitude', 
+                     'longitude', 
+                     IDCOL]]
+print(len(akv_geom))
+akv_geom.columns = ['latitude', 'longitude', IDCOL]
 
 ##########################################################################################
-# AKVEG North Slope
-
-# load observations
-di = '/mnt/poseidon/remotesensing/arctic/data/training/Test_03/'
-fi = 'AKVEG_pft_fcover_00.csv'
-obs_data = pd.read_csv(di + fi)
+# ABR_RS test 05
+fi = f'ABR_fcover_{PC}.csv'
+obs_data = pd.read_csv(f"{FCOVER_PATH}/{fi}")
 
 # extract geometry and unique ID
-akv_geom = obs_data[['Latitude', 
-                     'Longitude', 
-                     'Site Code']]
-
-akv_geom.columns = ['Lat', 'Lon', 'UID']
+abr_geom = obs_data[['latitude', 
+                     'longitude', 
+                     IDCOL]]
+print(len(abr_geom))
+abr_geom.columns = ['latitude', 'longitude', IDCOL]
 
 ##########################################################################################
-# NEON North Slope
-
-# load observations
-di = '/mnt/poseidon/remotesensing/arctic/data/training/Test_03/'
-fi = 'NEON_pft_fcover_00.csv'
-obs_data = pd.read_csv(di + fi)
+# AKAVA test 05
+fi = f'AVA_fcover_{PC}.csv'
+obs_data = pd.read_csv(f"{FCOVER_PATH}/{fi}")
 
 # extract geometry and unique ID
-neo_geom = obs_data[['subplot_lat', 
-                     'subplot_lon', 
-                     'name']]
-
-neo_geom.columns = ['Lat', 'Lon', 'UID']
+ava_geom = obs_data[['latitude', 
+                     'longitude', 
+                     IDCOL]]
+print(len(ava_geom))
+ava_geom.columns = ['latitude', 'longitude', IDCOL]
 
 ##########################################################################################
-# Unmixing North Slope data
-
-# load observations
-di = '/mnt/poseidon/remotesensing/arctic/data/training/testData_unmixingRegression/'
-fi = 'purePFT_merged_fCover_Macander2017_geometry.geojson'
-#fi = 'randomPts_fCover_10kmDist_Macander2017_geometry.geojson'
-
-with open(di + fi) as file:
-    data = json.load(file)
-
-geom = []
-for feature in data['features']:
-    lon = feature['properties']['xcoord']
-    lat = feature['properties']['ycoord']
-    uid = feature['properties']['id']
-    if lon is not None:
-        geom.append([lon, lat, uid])
+# NEON
+fi = f'NEO_fcover_{PC}.csv'
+obs_data = pd.read_csv(f"{FCOVER_PATH}/{fi}")
 
 # extract geometry and unique ID
-obs_geom = pd.DataFrame(geom, columns=['xcoord', 'ycoord', 'id'])
+neo_geom = obs_data[['latitude', 
+                     'longitude', 
+                     IDCOL]]
+print(len(neo_geom))
+neo_geom.columns = ['latitude', 'longitude', IDCOL]
 
-# create ee object (feature collection)
-obs_points = geemap.df_to_ee(obs_geom, 
-                             latitude='ycoord', 
-                             longitude='xcoord')
+##########################################################################################
+# Seward test 04
+fi = f'SP_fcover_{PC}.csv'
+obs_data = pd.read_csv(f"{FCOVER_PATH}/{fi}")
+
+# extract geometry and unique ID
+nge_geom = obs_data[['latitude', 
+                     'longitude', 
+                     IDCOL]]
+print(len(nge_geom))
+nge_geom.columns = ['latitude', 'longitude', IDCOL]
 
 ##########################################################################################
 # combine
-obs_geom = pd.concat([ava_geom, akv_geom, neo_geom], 
+obs_geom = pd.concat([akv_geom, abr_geom, ava_geom, neo_geom, nge_geom], 
                      axis=0, 
                      ignore_index=True)
+print(len(obs_geom))
 
 # create ee object (feature collection)
-obs_points = geemap.df_to_ee(obs_geom, 
-                             latitude='Lat', 
-                             longitude='Lon')
+obs_geom = obs_geom.reset_index()
+obs_points = geemap.df_to_ee(obs_geom,
+                             latitude='latitude',
+                             longitude='longitude')
+print(obs_points.size().getInfo())
 
 ##########################################################################################
+#sub-select points and extract geometry
 
 # select points that intercept HUC
 samplepoints = obs_points.filterBounds(grid_location_ee)
@@ -304,7 +304,7 @@ for f in feats:
 
 # Make a feature collection for export purposes
 points_ee = ee.FeatureCollection(points)
-print(f'{len(points)} {POINTBUFFER}-meter buffered points within HUC6 {CURRENTROI}.')
+print(f'{len(points)} {POINTBUFFER}-meter buffered points.')
 
 ##########################################################################################
 # Set Cloud Mask Function for S2-SR
@@ -329,13 +329,13 @@ def add_variables(image):
     date = ee.Date(image.get('system:time_start')).millis()
     # Return the image with the added bands.
     return (image
-            .addBands(image.normalizedDifference(['B8', 'B4']).rename('ndvi'))
+            .addBands(image.normalizedDifference(NORM_DIFF_BANDS).rename(VI))
             .addBands(ee.Image(date).rename('date').float())
            )
 
 
 ##########################################################################################
-# Apply Cloud Mask, NDVI, and Date Functions
+# Apply Cloud Mask, VI, and Date Functions
 ##########################################################################################
 s2_sr_col = (ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
                 .filterBounds(samplepoints)
@@ -343,9 +343,9 @@ s2_sr_col = (ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
                 #.filter(ee.Filter.lte('CLOUDY_PIXEL_PERCENTAGE', CLOUD_FILTER))
             )
 
-s2_sr = (s2_sr_col.map(mask_s2_clouds).map(add_variables)).select(['ndvi', 'date'])
+s2_sr = (s2_sr_col.map(mask_s2_clouds).map(add_variables)).select([VI, 'date'])
 
-print("Cloud and shadow mask applied to tiles. NDVI and Date bands created.")
+print(f"Cloud and shadow mask applied to tiles. {VI.title()} and Date bands created.")
 
 ##########################################################################################
 # Sample Raster and Export Table
@@ -357,17 +357,19 @@ start = time.time()
 for RANGE in date_ranges:
     
     # select cloud-filtered sentinel 2 imagery for time step
+    print(RANGE[0], RANGE[1])
     s2_by_date = s2_sr.filterDate(RANGE[0], RANGE[1])
     sentinel2 = s2_by_date.filterBounds(points_ee)
 
     # set band list
-    b_list = ['ndvi_median', 'date_first']
+    vi_med = f'{VI}_median'
+    b_list = [vi_med, 'date_first']
 
     # if image collection has images:
     if sentinel2.size().getInfo() != 0:
 
         # create composite for time step
-        composite = (sentinel2.select('ndvi')).reduce(ee.Reducer.median())
+        composite = (sentinel2.select(VI)).reduce(ee.Reducer.median())
         composite_date = (sentinel2.select('date')).reduce(ee.Reducer.first())
         composite = composite.addBands(composite_date)
 

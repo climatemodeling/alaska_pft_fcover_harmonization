@@ -40,7 +40,7 @@ HUCLIST = None # must be list: ['190604', '190603', '190602']
 ##########################################################################################
 
 # buffer around point to find median of intersecting pixel values
-POINTBUFFER = 30 # meters
+POINTBUFFER = 55 # meters
 PC = 'parent'
 
 ##########################################################################################
@@ -59,7 +59,7 @@ except Exception as e:
 # data Information
 IDCOL = 'Site Code'
 SCALE = 2
-BANDS = ['slope', 'aspect', 'hillshade']
+BANDS = ['slope', 'aspect', 'hillshade', 'elevation']
 
 ##########################################################################################
 # Create ee_to_df function for exporting
