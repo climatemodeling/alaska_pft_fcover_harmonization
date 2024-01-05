@@ -1,0 +1,40 @@
+ERROR 4: `GRIDCELL_310.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_313.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_318.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_350.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_374.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_376.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_377.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_378.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_380.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_389.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_390.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_391.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_568.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_569.tif' not recognized as a supported file format.
+ERROR 1: TIFFFillTile:Read error at row 4294967295, col 4294967295, tile 0; got 16278 bytes, expected 60754
+ERROR 1: TIFFReadEncodedTile() failed.
+ERROR 1: GRIDCELL_3658.tif, band 1: IReadBlock failed at X offset 0, Y offset 0: TIFFReadEncodedTile() failed.
+Traceback (most recent call last):
+  File "/home/6ru/anaconda3/bin/gdal_merge.py", line 4, in <module>
+    __import__('pkg_resources').run_script('GDAL==2.3.3', 'gdal_merge.py')
+  File "/home/6ru/anaconda3/lib/python3.7/site-packages/pkg_resources/__init__.py", line 651, in run_script
+    self.require(requires)[0].run_script(script_name, ns)
+  File "/home/6ru/anaconda3/lib/python3.7/site-packages/pkg_resources/__init__.py", line 1448, in run_script
+    exec(code, namespace, namespace)
+  File "/home/6ru/anaconda3/lib/python3.7/site-packages/GDAL-2.3.3-py3.7-linux-x86_64.egg-info/scripts/gdal_merge.py", line 597, in <module>
+    sys.exit(main())
+  File "/home/6ru/anaconda3/lib/python3.7/site-packages/GDAL-2.3.3-py3.7-linux-x86_64.egg-info/scripts/gdal_merge.py", line 582, in main
+    fi.copy_into(t_fh, band, band, nodata)
+  File "/home/6ru/anaconda3/lib/python3.7/site-packages/GDAL-2.3.3-py3.7-linux-x86_64.egg-info/scripts/gdal_merge.py", line 329, in copy_into
+    nodata_arg)
+  File "/home/6ru/anaconda3/lib/python3.7/site-packages/GDAL-2.3.3-py3.7-linux-x86_64.egg-info/scripts/gdal_merge.py", line 132, in raster_copy
+    data, t_xsize, t_ysize, t_band.DataType)
+  File "/home/6ru/anaconda3/lib/python3.7/site-packages/osgeo/gdal.py", line 2444, in WriteRaster
+    return _gdal.Band_WriteRaster(self, *args, **kwargs)
+TypeError: not a unicode string or a bytes
+Projection of input dataset and current location appear to match
+   2%   5%   8%  11%  14%  17%  20%  23%  26%  29%  32%  35%  38%  41%  44%  47%  50%  53%  56%  59%  62%  65%  68%  71%  74%  77%  80%  83%  86%  89%  92%  95%  98% 100%
+r.in.gdal complete. Raster map <B7_2019_summer_mosaic_ak_arctic> created.
+Region for the current mapset updated
+Color table for raster map <B7_2019_summer_mosaic_ak_arctic> set to 'grey'

@@ -8,7 +8,7 @@ import glob
 import numpy as np
 
 BUF=30
-PC='parent'
+PC='child'
 VI = 'ndvi'
 
 # set input vars

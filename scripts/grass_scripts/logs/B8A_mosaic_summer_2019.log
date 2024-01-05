@@ -1,0 +1,11 @@
+ERROR 4: `GRIDCELL_1658.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_2605.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_311.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_312.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_315.tif' not recognized as a supported file format.
+ERROR 4: `GRIDCELL_4325.tif' not recognized as a supported file format.
+Projection of input dataset and current location appear to match
+   2%   5%   8%  11%  14%  17%  20%  23%  26%  29%  32%  35%  38%  41%  44%  47%  50%  53%  56%  59%  62%  65%  68%  71%  74%  77%  80%  83%  86%  89%  92%  95%  98% 100%
+r.in.gdal complete. Raster map <B8A_2019_summer_mosaic_ak_arctic> created.
+Region for the current mapset updated
+Color table for raster map <B8A_2019_summer_mosaic_ak_arctic> set to 'grey'

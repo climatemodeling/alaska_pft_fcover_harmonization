@@ -55,8 +55,10 @@ DIR_PATH = '/mnt/poseidon/remotesensing/arctic/data/rasters/S2SR/ak_arctic_summe
 if os.path.isdir(DIR_PATH) == False:
     os.mkdir(DIR_PATH)
 
+# logging info
+LOGNAME = "AK_Arctic_S2_20m_dwnld"
 logging.basicConfig(level = logging.INFO,
-                    filename=f'{DIR_PATH}/std.log', filemode='w',
+                    filename=f'{DIR_PATH}/{LOGNAME}.log', filemode='w',
                     format='%(asctime)s >>> %(message)s', 
                     datefmt='%d-%b-%y %H:%M:%S')
 
@@ -285,91 +287,96 @@ for RANGE in date_ranges:
 
     for grid_num, poly in enumerate(polys):
 
-        logging.info(f'Rank: {rank} \nGrid number: {grid_num}\nDate range: {RANGE[0]} to {RANGE[1]}')
-        print(f'Rank: {rank} \nGrid number: {grid_num}\nDate range: {RANGE[0]} to {RANGE[1]}')
+        if grid_num == 317:
 
-        # set export file name
-        FILE = f'{date_dir}/GRIDCELL_{grid_num}.tif'
+            logging.info(f'Rank: {rank} \nGrid number: {grid_num}\nDate range: {RANGE[0]} to {RANGE[1]}')
+            print(f'Rank: {rank} \nGrid number: {grid_num}\nDate range: {RANGE[0]} to {RANGE[1]}')
 
-        if OVERWRITE == False:
-            if os.path.isfile(FILE):
-                logging.info(f'{FILE} ALREADY EXISTS. SKIPPED.')
-                print(f'{FILE} ALREADY EXISTS. SKIPPED.')
-                continue # go to next loop iteration 
+            # set export file name
+            FILE = f'{date_dir}/GRIDCELL_{grid_num}.tif'
 
-        # apply cloud mask and date band
-        s2_sr_col = (ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
-                .filterBounds(poly)
-                .filterDate(str(RANGE[0]), str(RANGE[1]))
-                .filter(ee.Filter.lte('CLOUDY_PIXEL_PERCENTAGE', CLOUD_FILTER))
-            )
-
-        # apply cloud mask & select current rank bands
-        s2_sr = (s2_sr_col.map(mask_s2_clouds).map(add_variables)).select(CURRENTBANDS)
-
-        # IF IMAGE COLLECTION HAS IMAGES:
-        if s2_sr.size().getInfo() != 0:
-
-            # create median composite for time step
-            composite = (s2_sr.select(CURRENTBANDS)).reduce(ee.Reducer.median())
-            composite = composite.clip(poly)
-
-            # if no overwriting allowed and file exists, move on to next loop iteration
             if OVERWRITE == False:
                 if os.path.isfile(FILE):
                     logging.info(f'{FILE} ALREADY EXISTS. SKIPPED.')
-                    continue # go to next loop iteration            
+                    print(f'{FILE} ALREADY EXISTS. SKIPPED.')
+                    continue # go to next loop iteration 
 
-            try:
-                
-                # export multi-band GeoTIFF file of composite
-                url = composite.getDownloadUrl({'bands': b_list,
-                                                'region': poly,
-                                                'scale': SCALE,
-                                                'format': 'GEO_TIFF',
-                                                'filePerBand': False})
+            # apply cloud mask and date band
+            s2_sr_col = (ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+                    .filterBounds(poly)
+                    .filterDate(str(RANGE[0]), str(RANGE[1]))
+                    .filter(ee.Filter.lte('CLOUDY_PIXEL_PERCENTAGE', CLOUD_FILTER))
+                )
 
-                # download
-                response = requests.get(url)
-                with open(FILE, 'wb') as fd:
-                    fd.write(response.content)
-                    logging.info(f'SUCCESS: {FILE}')
-                    print(f'SUCCESS: {FILE}')
+            # apply cloud mask & select current rank bands
+            s2_sr = (s2_sr_col.map(mask_s2_clouds).map(add_variables)).select(CURRENTBANDS)
 
-            # if GEE raises an error (probably user memory limit)
-            except Exception as e:
-                logging.error('EXCEPTION RAISED. SKIPPING ...', exc_info=True)
-                print(f'EXCEPTION RAISED FOR: {FILE} SKIPPING ...')
+            # IF IMAGE COLLECTION HAS IMAGES:
+            if s2_sr.size().getInfo() != 0:
 
-        # IF IMAGE COLLECTION DOESNT HAVE IMAGES:
-        else:
-
-            # create dummy composite for bands
-            composite = ee.Image(-999).rename(b_list[0])
-            if len(b_list) > 0:
-                for b in b_list[1:]:
-                    composite = composite.addBands(ee.Image(-999)).rename(b_list[b])
-                    
-            try:
-
-                # download dummy tif file
+                # create median composite for time step
+                composite = (s2_sr.select(CURRENTBANDS)).reduce(ee.Reducer.median())
                 composite = composite.clip(poly)
-                url = composite.getDownloadUrl({'bands': b_list,
-                                                'region': poly,
-                                                'scale': SCALE,
-                                                'format': 'GEO_TIFF',
-                                                'filePerBand': False})
-                # download
-                response = requests.get(url)
-                with open(FILE, 'wb') as fd:
-                    fd.write(response.content)
-                    logging.info(f'NO SENTINAL DATA TO CREATE COMPOSITE. SAVED DUMMY AT: {FILE}')
-                    print(f'NO SENTINAL DATA TO CREATE COMPOSITE. SAVED DUMMY AT: {FILE}')
+
+                # if no overwriting allowed and file exists, move on to next loop iteration
+                if OVERWRITE == False:
+                    if os.path.isfile(FILE):
+                        logging.info(f'{FILE} ALREADY EXISTS. SKIPPED.')
+                        continue # go to next loop iteration            
+
+                try:
+                    
+                    # export multi-band GeoTIFF file of composite
+                    url = composite.getDownloadUrl({'bands': b_list,
+                                                    'region': poly,
+                                                    'scale': SCALE,
+                                                    'format': 'GEO_TIFF',
+                                                    'filePerBand': False})
+
+                    # download
+                    response = requests.get(url)
+                    with open(FILE, 'wb') as fd:
+                        fd.write(response.content)
+                        logging.info(f'SUCCESS: {FILE}')
+                        print(f'SUCCESS: {FILE}')
+
+                # if GEE raises an error (probably user memory limit)
+                except Exception as e:
+                    logging.error('EXCEPTION RAISED. SKIPPING ...', exc_info=True)
+                    print(f'EXCEPTION RAISED FOR: {FILE} SKIPPING ...')
+
+            # IF IMAGE COLLECTION DOESNT HAVE IMAGES:
+            else:
+
+                # create dummy composite for bands
+                composite = ee.Image(-999).rename(b_list[0])
+                if len(b_list) > 0:
+                    for b in b_list[1:]:
+                        composite = composite.addBands(ee.Image(-999)).rename(b_list[b])
+                        
+                try:
+
+                    # download dummy tif file
+                    composite = composite.clip(poly)
+                    url = composite.getDownloadUrl({'bands': b_list,
+                                                    'region': poly,
+                                                    'scale': SCALE,
+                                                    'format': 'GEO_TIFF',
+                                                    'filePerBand': False})
+                    # download
+                    response = requests.get(url)
+                    with open(FILE, 'wb') as fd:
+                        fd.write(response.content)
+                        logging.info(f'NO SENTINAL DATA TO CREATE COMPOSITE. SAVED DUMMY AT: {FILE}')
+                        print(f'NO SENTINAL DATA TO CREATE COMPOSITE. SAVED DUMMY AT: {FILE}')
+                
+                # if the dummy tif fails for some  GEE reason, give up.
+                except Exception as e:
+                    logging.error('EXCEPTION RAISED. SKIPPING ...', exc_info=True)
+                    print(f'EXCEPTION RAISED. SKIPPING ...')
             
-            # if the dummy tif fails for some  GEE reason, give up.
-            except Exception as e:
-                logging.error('EXCEPTION RAISED. SKIPPING ...', exc_info=True)
-                print(f'EXCEPTION RAISED. SKIPPING ...')
+        else:
+            continue
 
 stop = time.time()
 time_taken = (stop - start)/3600

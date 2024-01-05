@@ -2,6 +2,9 @@
 # enable next line for debugging purpose
 # set -x
 
+LOGPATH=/mnt/poseidon/remotesensing/arctic/scripts/snap_esa/S1_Preprocessing_010524.log
+exec 2> >(tee $LOGPATH)
+
 ############################################
 # Script Information
 ############################################
@@ -15,7 +18,7 @@
 ############################################
 
 # path to snap and gpt executable
-export PATH=/mnt/locutus/remotesensing/jbk/lib/snap/bin:$PATH
+export PATH=/home/6ru/snap/bin:$PATH
 gptPath="gpt"
 
 ############################################
@@ -50,14 +53,25 @@ removeExtension() {
 # Main processing
 ############################################
 
-# Create the target directory
-mkdir -p "${targetDirectory}"
+# Create the target directory if needed
+if ! test -d ${targetDirectory}; then
+  mkdir -p "${targetDirectory}"
+fi
 
-# the d option limits the elements to loop over directories. Remove it (ls -1d) if you want to use files.
+# the d option limits the elements to loop over directories. Remove d (ls -1d) if you want to use files
 for F in $(ls -1 "${sourceDirectory}"/*.zip); do
+
+  # create target file name
   sourceFile="$(realpath "$F")"
-  echo Working on ${sourceFile} ...
   targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
-  ${gptPath} ${graphXmlPath} -e -p ${parameterFilePath} -t ${targetFile} ${sourceFile}
-  echo Exported to ${targetFile}
+  
+  # do not overwrite existing files
+  if [ -f ${targetFile} ]; then
+    echo "File ${targetFile} already exists."
+  else
+    echo "Working on ${sourceFile} ..."
+    ${gptPath} ${graphXmlPath} -e -p ${parameterFilePath} -t ${targetFile} ${sourceFile}
+    echo SUCCESS! Exported to ${targetFile}
+  fi
+
 done

@@ -1,9 +1,9 @@
 MAPSET=morgan #mapset must already be created
-BANDS=(B2 B3 B4 B8)
-MONTHS=("01" "02" "03" "04" "05")
-INPATH=/mnt/poseidon/remotesensing/arctic/data/rasters/S2SR/ak_arctic
+BANDS=(B5 B6 B7 B8A B11 B12)
+MONTHS=("06")
+INPATH=/mnt/poseidon/remotesensing/arctic/data/rasters/S2SR/ak_arctic_summer
 START=0 #first tile of interest
-END=0 #last tile of interest
+END=4594 #last tile of interest
 
 grasscr global_latlon ${MAPSET}
 
@@ -24,17 +24,20 @@ do
     for(( i=$START; i<=$END; i++ ))
     do
 
+      # create grass map name
       tif_file=${month_folder}/GRIDCELL_${i}.tif
       filename=$(basename -- "$tif_file")
       name="${filename%.*}"
       output_name=${name}_2019-${m}_${b}
 
-      # echo ${tif_file}
-      # echo ${output_name}
-
-      # import tif
+      # import tif into grass
       r.in.gdal -e input=${tif_file} output=${output_name}
       r.colors map=${output_name} color=grey
+
+      # grow region extent from first image
+      if [ $i -eq 0 ]; then
+        g.region rast=${output_name}
+      fi
 
     done
 
