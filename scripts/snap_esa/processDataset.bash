@@ -2,7 +2,8 @@
 # enable next line for debugging purpose
 # set -x
 
-LOGPATH=/mnt/poseidon/remotesensing/arctic/scripts/snap_esa/S1_Preprocessing_010524.log
+syst_date=$(date +"%d-%m-%y-%H%M")
+LOGPATH=/mnt/poseidon/remotesensing/arctic/scripts/snap_esa/logs/S1_Preprocessing_${syst_date}.log
 exec 2> >(tee $LOGPATH)
 
 ############################################
@@ -28,7 +29,7 @@ gptPath="gpt"
 # first parameter is a path to the graph xml
 graphXmlPath="$1"
 
-# second parameter is a path to a parameter file (.parameter) for graph parameters
+# second parameter is a path to a parameter file (.properties) for graph parameters
 parameterFilePath="$2"
 
 # use third parameter for path to source products

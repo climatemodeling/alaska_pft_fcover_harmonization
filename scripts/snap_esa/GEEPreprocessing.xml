@@ -97,16 +97,6 @@
       <externalAuxFile/>
     </parameters>
   </node>
-  <node id="Write">
-    <operator>Write</operator>
-    <sources>
-      <sourceProduct refid="Terrain-Correction"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>${targetFile}</file>
-      <formatName>BMP</formatName>
-    </parameters>
-  </node>
   <applicationData id="Presentation">
     <Description>Google Earth Engine pre-processing workflow. Credit to https://www.youtube.com/watch?v=2bQ0yw_oBp4&amp;t=7s</Description>
     <node id="Read">

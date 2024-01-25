@@ -5,3 +5,4 @@ scripts/snap_esa/ASTER_Alaska_DEM.tif
 scripts/snap_esa/${targetFile}.*
 *.ipynb_checkpoints*
 *__pycache__*
+*logs*
