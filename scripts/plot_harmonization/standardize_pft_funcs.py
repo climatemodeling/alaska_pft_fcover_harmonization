@@ -322,6 +322,59 @@ def fill_habits(unique_species, checklist, u_name, c_unofficial_name,
     
     # return dataframe
     return finalhabits
+
+
+# aggregate to final PFT schema
+def agg_to_pft_schema(df):
+
+    # extract evergreen/decid shrub/tree col names
+    evergreen = sorted([col for col in df.columns if all(k in col for k in ['evergreen dwarf'])])
+    deciduous = sorted([col for col in df.columns if any(k in col for k in ['deciduous dwarf'])])
+    evergtree = sorted([col for col in df.columns if all(k in col for k in ['evergreen tree'])])
+    decidtree = sorted([col for col in df.columns if all(k in col for k in ['deciduous tree'])])
+    # nonvasc = sorted([col for col in df.columns if any(k in col for k in ['lichen', 'bryophyte'])])
+
+    # select cols and set as new dataframe
+    e_shrub = df[evergreen]
+    d_shrub = df[deciduous]
+    e_tree = df[evergtree]
+    d_tree = df[decidtree]
+    # n_vasc = test[nonvasc]
+
+    # sum sub-categories into new main category and select
+    # shrubs
+    e_shrub['evergreen shrub total cover (%)'] = e_shrub.sum(axis=1)
+    e_shrub = e_shrub[['evergreen shrub total cover (%)']]
+    d_shrub['deciduous shrub total cover (%)'] = d_shrub.sum(axis=1)
+    d_shrub = d_shrub[['deciduous shrub total cover (%)']]
+    # trees
+    e_tree['evergreen tree total cover (%)'] = e_tree.sum(axis=1)
+    e_tree = e_tree[['evergreen tree total cover (%)']]
+    d_tree['deciduous tree total cover (%)'] = d_tree.sum(axis=1)
+    d_tree = d_tree[['deciduous tree total cover (%)']]
+    #non-vascular
+    # n_vasc['non-vascular total cover (%)'] = n_vasc.sum(axis=1)
+    # n_vasc = n_vasc[['non-vascular total cover (%)']]
+
+    # drop old sub-columns and replace with new
+    subcats = evergreen + deciduous + evergtree + decidtree # + n_vasc
+    cats = df.drop(columns=subcats) # get everything but leafy plants
+    aggregated = pd.concat([e_shrub, 
+                            e_tree, 
+                            d_shrub, 
+                            d_tree, 
+                            # n_vasc,
+                            cats], 
+                           axis=1)
+    
+    cover = sorted([col for col in aggregated if 'cover' in col])
+    other = sorted([col for col in aggregated if 'cover' not in col])
+    c = aggregated[cover]
+    o = aggregated[other]
+    newdf = pd.concat([c,o], axis=1)
+        
+    return newdf
+
     
 ##########################################################################################
 # Pandas row-wise functions to use with .apply()
@@ -363,6 +416,64 @@ def cleanlist(row):
     newlist = new.split(',')
     newlist = list(set(newlist))
     return ','.join(newlist)
+
+# flatten multilevel
+def flatten_multilevel(grouped):
+    
+    """
+    Flattens a multi-index pandas dataframe with plots (idx0) 
+    and associated habit fcovers (idx1).
+    Returns a single index dataframe.
+    """
+    
+    grouped.columns = grouped.columns.get_level_values(0)
+    grouped = grouped.reset_index()
+    return grouped
+
+# transpose
+# this function is ABR-specific
+def transpose_df(grouped, habit_col):
+    
+    """
+    Transposes a flattened multi-index dataframe so that plotIDs
+    are rowwise and columns are standardized habits. Cells contain
+    aggregated fcover values.
+    Returns a reset single index dataframe.
+    """
+    
+    groups = grouped.set_index(['plot_id', habit_col]).stack().unstack([1,2])
+    groups.columns = groups.columns.get_level_values(0)
+    groups = groups.reset_index()
+    return groups
+
+# all required column names
+# if a column doesn't exist, add it and fill with nan fcover
+def add_standard_cols(groups):
+    
+    # required columns
+    necessary_cols = ['deciduous dwarf shrub cover (%)',
+                      'deciduous dwarf to low shrub cover (%)',
+                      'deciduous dwarf to tall shrub cover (%)',
+                      'deciduous dwarf to tree cover (%)',
+                      'deciduous tree cover (%)',
+                      'evergreen dwarf shrub cover (%)',
+                      'evergreen dwarf to low shrub cover (%)',
+                      'evergreen dwarf to tall shrub cover (%)',
+                      'evergreen dwarf to tree cover (%)',
+                      'evergreen tree cover (%)',
+                      'bryophyte cover (%)',
+                      'forb cover (%)',
+                      'graminoid cover (%)',
+                      'lichen cover (%)']
+    
+    # add missing columns and fill with nan
+    cols = groups.columns.tolist()
+    addcols = []
+    for nc in necessary_cols:
+        if nc not in cols:
+            addcols.append(nc)
+    groups[addcols] = np.nan
+    return groups
 
 
 

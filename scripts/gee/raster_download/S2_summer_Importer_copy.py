@@ -35,7 +35,7 @@ CLOUD_FILTER = 100
 ROI = 'SHP'
 
 # if ROI = BBOX or SHP (path to .geojson or .shp, otherwise ''):
-IN_PATH = '/mnt/poseidon/remotesensing/arctic/data/vectors/supplementary/tundra_alaska/tundra_alaska.shp'
+IN_PATH = '/mnt/poseidon/remotesensing/arctic/data/vectors/supplementary/tundra_alaska_polygon_latlon/tundra_alaska_wgs84.shp'
 # if ROI = STATE or COUNTRY (administrative boundaries, otherwise None):
 COUNTRY = None
 # if ROI = HUC, state abbreviation for HUC, if STATE, fulls state name:
@@ -51,7 +51,7 @@ GRIDSIZE = 18000
 #----------------------------------------------------------------------------------------#
 
 # output file
-DIR_PATH = '/mnt/poseidon/remotesensing/arctic/data/rasters/S2SR/ak_arctic_summer'
+DIR_PATH = '/mnt/poseidon/remotesensing/arctic/data/rasters/s2_sr_tiled/ak_arctic_summer'
 if os.path.isdir(DIR_PATH) == False:
     os.mkdir(DIR_PATH)
 
@@ -60,7 +60,7 @@ if os.path.isdir(DIR_PATH) == False:
 # data Information
 IDCOL = 'Site Code'
 SCALE = 10
-BANDS = ['B4']
+BANDS = ['B7']
 start_date = date(2019, 6, 1)# Y-M-D (2019, 1, 1)
 end_date = date(2019, 8, 31) # Y-M-D minus 5 for even 'days' intervals (6 days for 2020)
 TIMESTEP = None # 'months', 'days', or None
@@ -75,7 +75,7 @@ OVERWRITE = True # True to overwrite .tiff, False to pass existing .tiff
 #b8POLY_LIST = [1381,2300,2301,2735,3255,3526,3528,3558,3571,3600,3601,3679,3837,4242,4243,4246,4288,4289,4309,4322,4334,4366,4367]
 #b8aPOLY_LIST = [1658,2605,311,312,315,4325]
 #POLY_LIST = [2499,328,356,359]
-POLY_LIST = [4576]
+POLY_LIST = [3658]
 
 # logging info
 LOGNAME = f"AK_Arctic_S2_{str(SCALE)}m_dwnld_{'_'.join(BANDS)}"

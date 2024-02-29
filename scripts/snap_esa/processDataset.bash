@@ -5,6 +5,7 @@
 syst_date=$(date +"%d-%m-%y-%H%M")
 LOGPATH=/mnt/poseidon/remotesensing/arctic/scripts/snap_esa/logs/S1_Preprocessing_${syst_date}.log
 exec 2> >(tee $LOGPATH)
+TOTAL_START_TIME=$(date +%s)
 
 ############################################
 # Script Information
@@ -55,24 +56,40 @@ removeExtension() {
 ############################################
 
 # Create the target directory if needed
-if ! test -d ${targetDirectory}; then
-  mkdir -p "${targetDirectory}"
+if [ -d $targetDirectory ]
+then
+  echo TARGET DIRECTORY $targetDirectory EXISTS
+else
+  echo CREATING TARGET DIRECTORY $targetDirectory
+  # mkdir -p "${targetDirectory}"
 fi
 
-# the d option limits the elements to loop over directories. Remove d (ls -1d) if you want to use files
-for F in $(ls -1 "${sourceDirectory}"/*.zip); do
+# loop over zip files in directory
+for file in ${sourceDirectory}/*.zip
+do
 
   # create target file name
-  sourceFile="$(realpath "$F")"
-  targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
+  sourceFile="$(realpath "$file")"
+  targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${file})").dim"
   
   # do not overwrite existing files
-  if [ -f ${targetFile} ]; then
-    echo "File ${targetFile} already exists."
+  if [ -f $targetFile ]
+  then
+    echo FILE $targetFile ALREADY EXISTS
   else
-    echo "Working on ${sourceFile} ..."
-    ${gptPath} ${graphXmlPath} -e -p ${parameterFilePath} -t ${targetFile} ${sourceFile}
-    echo SUCCESS! Exported to ${targetFile}
+    echo WORKING ON $sourceFile
+    START_TIME=$(date +%s)
+    
+    # execute graph xml
+    $gptPath $graphXmlPath -e -p $parameterFilePath -t $targetFile $sourceFile
+    
+    END_TIME=$(date +%s)
+    SECS=$(($END_TIME - $START_TIME))
+    echo TIME PASSED: $(($SECS / 60)) MINUTES
+    echo EXPORTED TO $targetFile
   fi
 
 done
+
+TOTAL_END_TIME=$(date +%s)
+echo TOTAL ELAPSED TIME: $(($TOTAL_END_TIME - $TOTAL_START_TIME / 60 / 60)) HOURS

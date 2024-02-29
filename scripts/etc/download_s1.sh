@@ -1,11 +1,12 @@
 #!/bin/bash
 
-LOGPATH=/mnt/poseidon/remotesensing/arctic/scripts/etc/logs/S1_Download_011724.log
+datetime=date +%s
+LOGPATH=/mnt/poseidon/remotesensing/arctic/scripts/etc/logs/S1_Download_${datetime}.log
 exec 2> >(tee $LOGPATH)
 
 USERNAME=msteckler98
 PASSWORD=E@rthd@t@1998!
-BASE_PATH=/mnt/poseidon/remotesensing/arctic/scripts/snap_esa/Sentinel1
+BASE_PATH=/mnt/poseidon/remotesensing/arctic/data/rasters/s1_grd_zips
 TXT_PATH=/mnt/poseidon/remotesensing/arctic/scripts/etc/s1_arctic_files.txt
 OVERWRITE=no #yes or no
 
