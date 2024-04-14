@@ -130,7 +130,7 @@ def create_checklist_habits(checklist, mapping_name, habit):
     # For every genus-species, create a list of potential habits
     checklist_merge = (checklist
                        .groupby(checklist[mapping_name])[habit]
-                       .apply(uniquelist)
+                       .apply(list(set()))
                        .reset_index())
     
     # Make lists strings, remove brackets, remove whitespace

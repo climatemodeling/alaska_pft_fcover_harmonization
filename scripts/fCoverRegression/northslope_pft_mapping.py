@@ -328,6 +328,7 @@ for gridcell in grid_list:
         except Exception as e:
             print(f'EXCEPTION WAS RAISED WHILE EXPORTING {gridcell}: {e}')
             logging.error(f'EXCEPTION WAS RAISED WHILE EXPORTING {gridcell}: ', exc_info=True)
+            continue
             
         # set crs
         opts = gdal.WarpOptions(format='GTiff', dstSRS='EPSG:4326')
