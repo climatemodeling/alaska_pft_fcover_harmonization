@@ -129,15 +129,16 @@ def create_checklist_habits(checklist, mapping_name, habit):
     
     # For every genus-species, create a list of potential habits
     checklist_merge = (checklist
-                       .groupby(checklist[mapping_name])[habit]
-                       .apply(list(set()))
+                       .groupby(mapping_name)[habit]
+                       .apply(set)
                        .reset_index())
     
     # Make lists strings, remove brackets, remove whitespace
     checklist_merge[habit] = (checklist_merge[habit]
-                                .astype(str)
-                                .str.strip('[]')
-                                .str.strip())
+                              .astype(str)
+                              .str.strip('{}')
+                              .str.strip("''")
+                              .str.strip())
     
     # clean up the strings created above
     checklist_merge[habit] = checklist_merge[habit].apply(cleanlist)
@@ -146,7 +147,7 @@ def create_checklist_habits(checklist, mapping_name, habit):
     return checklist_merge
 
 # add leaf habit to species using macander 22 supplementary crosswalk
-def add_leaf_habit(species_pft, evergrndecid):
+def add_leaf_retention(species_pft, evergrndecid, ret_col_name):
     
     # add evergreen/deciduous information
     species_pft_l = species_pft.to_numpy()
@@ -190,21 +191,13 @@ def add_leaf_habit(species_pft, evergrndecid):
         string = ','.join(newl)
         final_l.append(string)
         
-    species_pft['Leaf Retention'] = final_l
-    
-    # clean up
-    species_pft['Potential Habit'] = species_pft['Habit']
-    species_pft[['Potential Height', 'Height']] = np.NaN
-    # set order of columns
-    species_pft = species_pft[['Name', 'Mapping Name', 'Potential Habit', 
-                               'Habit', 'Leaf Retention', 'Potential Height', 
-                               'Height']]
-    
+    species_pft[ret_col_name] = final_l
     return species_pft
 
 # connect habit information to species names using AKVEG species checklist
-def fill_habits(unique_species, checklist, u_name, c_unofficial_name, 
-                c_official_name, mapping_name, habit):
+# connect habit information to species names using AKVEG species checklist
+def join_to_checklist(unique_species, checklist, u_name, c_unofficial_name, 
+                      c_official_name, mapping_name, habit):
     
     ######################################################################################
     # compare genus-species to official name genus-species
@@ -318,7 +311,7 @@ def fill_habits(unique_species, checklist, u_name, c_unofficial_name,
     finalhabits[habit] = finalhabits[habit].fillna(finalhabits[f'{habit}3'])
     finalhabits[habit] = finalhabits[habit].fillna(finalhabits[newhabit4])
     finalhabits = finalhabits[[u_name, mapping_name, habit]]
-    finalhabits.columns = ['Name', mapping_name, habit]
+    finalhabits.columns = [u_name, mapping_name, habit]
     
     # return dataframe
     return finalhabits
@@ -380,7 +373,7 @@ def agg_to_pft_schema(df):
 # Pandas row-wise functions to use with .apply()
 ##########################################################################################
 
-# get genus and species name
+# function to get genus and species name
 def get_substrings(row):
     
     # extract genus + species name
@@ -396,7 +389,7 @@ def get_substrings(row):
     string = string.replace('[','').replace(']','')
     return string
 
-# get genus name
+# function get genus name only
 def get_first_substring(row):
     
     # extract genus name

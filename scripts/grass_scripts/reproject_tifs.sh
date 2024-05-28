@@ -1,3 +1,9 @@
+# build list of file names between range of numbers
+# for ((i=1077; i<=4594; i++)); do echo GRIDCELL_${i}.tif >> tifs_aoi.txt; done
+
+# build vrt
+
+
 # for many tifs
 # path=/mnt/poseidon/remotesensing/arctic/data/rasters/model_results_tiled
 # cd ${path}_01
