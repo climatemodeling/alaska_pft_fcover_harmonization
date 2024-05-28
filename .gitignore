@@ -5,6 +5,7 @@ scripts/snap_esa/Sentinel1_Preprocessed
 scripts/snap_esa/ASTER_Alaska_DEM.tif
 scripts/snap_esa/${targetFile}.*
 scripts/etc/s1_arctic_files.txt
+scripts/plot_harmonization/cshapes
 *.csv
 *.tif
 *.ipynb_checkpoints*

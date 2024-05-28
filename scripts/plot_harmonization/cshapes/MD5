@@ -1,0 +1,13 @@
+3d2cd37f8e716cd2f39f5cadebba9905 *Changelog
+ca04429344fdc2a6a8da8b5622e27051 *DESCRIPTION
+e7be43618e3fd7bc940bbc65ab17f148 *NAMESPACE
+16bb17d8cf8801ccd885db59f5e8b16d *R/cshp.R
+ee953b1f081b67e64d1eb96a93af2127 *R/distlist.R
+4c0d916ab46b7eec8ded217d9080291b *R/distmatrix.R
+b26fc6e748558b2d18b250eb3ed06d97 *inst/extdata/cshapes_2_cow.topojson.xz
+e6ff39608681467328607490a8bd4bc2 *inst/extdata/cshapes_2_gw.topojson.xz
+b20d271875a4268ebd60e57f83673907 *man/cshp.Rd
+fbf668832014766f7da2aab34e19c3bc *man/distlist.Rd
+aa82c9b817603f73c8e6930cdb925d7b *man/distmatrix.Rd
+88c014b9015c6682969eea0931aeaea6 *tests/testthat.R
+363af40740e6b0c632202a9d179c3c53 *tests/testthat/test_installed.R

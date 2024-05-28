@@ -1,0 +1,108 @@
+2021-05-31 (2.0)
+* Updated CShapes until December 31, 2019.
+* Backdated Cshapes to January 1st, 1886 (previously January 1st 1946).
+* Added coding of dependent territories (previously only independent states).
+* Split dataset into separate COW and GW-based version
+* Collapsed start/end-year, -month and -day into single column string
+* Added variables for dependency status and owner, as well as variable to indicate periods with undefined boundaries (example: Ethiopia before boundary treaty with neighboring colonial powers in May 1897)
+
+
+2016-11-30 (0.6)
+* Updated CShapes until June 30, 2016.
+* The sequence of polygons for the Soviet Union now uses the correct GW start
+  and end dates. This used to be an inconsistency in all previous versions of the 
+  dataset (thanks to Karim Bahgat for helping us create the new polygons). 
+* Fixed wrong GW date of Namibia's secession from South Africa
+* Set Indonesia's GW start date to Jan 1, 1946 in line with coding conventions.
+* Fixed wrong GW end dates for Vietnam polygons in 1975.
+* Fixed wrong GW end date for China before separation of Taiwan in 1949.
+* Fixed wrong GW end date for Pakistan before separation of Bangladesh 
+  in 1971.
+* Fixed wrong capital name and location for the Mali Federation.
+* Dropped the Mali Federation from the GW list of states.
+* Fixed the wrong start/end dates for the transition from the Mali Federation
+  to Mali proper (thanks to Karim Bahgat for reporting all these issues).
+
+2015-10-30 (0.5-1)
+* Updated CShapes until June 30, 2015
+* Removed ISO codes for Kosovo since no official code has
+  been assigned. 
+
+2013-05-05 (0.4-2)
+* Fixed ISO codes for Kosovo (thanks to Luc Girardin).
+* Adapted CShapes to the new version of the Gleditsch & Ward
+  country list (changes made in March 2013). This version fixes 
+  the inconsistency with the G&W list introduced in CShapes 
+  version 0.2-5 (Macedonia).
+
+2012-01-07 (0.4-1)
+* Re-wrote the package to eliminate Java dependencies, which 
+  causes performance issues on some systems.
+* Updated GIS data to 2012: Added South Sudan, changed
+  boundaries of Sudan. Note: When introducing the new ISOCODE for 
+  South Sudan (728), the ISO also changed the ISOCODE for
+  Sudan, from 736 to 729. We use this new code as of July 9, 2011.
+
+2012-07-26 (0.3-2)
+* Changed package maintainer in accordance with CRAN
+  requirements.
+* Fixed inverted ISO two- and three-letter codes for Kosovo.
+
+2011-06-26 (0.3-1)
+* Added a distlist function that returns distances
+  in a dyadic format rather than a matrix.
+* Dropped United Arab Republic, which is not coded in 
+  G&W. The corresponding polygons have GWCODE=-1 and 
+  are dropped in all computations based on G&W.
+
+2011-05-03 (0.2-9)
+* Coded Western Sahara entirely as part of Morocco
+  as of August 5, 1979 (Thanks to Nils-Christian Bormann)
+
+2011-03-21 (0.2-8)
+* Fixed incorrect location of Mali's capital.
+  (Thanks to Sebastian Schutte)
+
+2010-11-04 (0.2-7)
+* Fixed GDR coding error (Buesingen exclave). (Thanks to
+  Dan Reiter). Small changes to Java code.
+
+2010-10-10 (0.2-6)
+* Fixed wrong start date for East Timor. Deleted duplicate
+  polygon for Yugoslavia. (Thanks to Andreas Tollefsen)
+
+2010-09-15 (0.2-5)
+* Fixed several unintended polygon overlaps in the
+  Gleditsch & Ward coding of cshapes (for Yugoslavia 
+  and its successor states). Note: in order to preserve
+  the order of polygons (which were coded according to the 
+  COW system) we set the G&W start date for Macedonia to the 
+  COW date of April 8, 1993. (Thanks to Andreas Tollefsen)
+
+2010-06-09 (0.2-4)
+* Fixed incorrect longitude of Tonga's capital.
+  (Thanks to Evan McCulla)
+
+2010-02-24 (0.2-3)
+* Fixed missing argument in cshp() function.
+* Removed special characters from country names.
+
+2010-01-26 (0.2-2)
+* Recompiled for Java version 1.5.
+
+2010-01-18 (0.2-1)
+* Fixed wrong ISO codes of Bahrain.
+* Added 'date' parameter to cshp() function. 
+
+2010-01-05 (0.1-4)
+* Excluded computation of example.
+
+2009-12-26 (0.1-3)
+* Fixed minor issue to pass R CMD check.
+
+2009-11-15 (0.1-2)
+* Added GIS metadata in file inst/shp/cshapes.shp.xml.
+* Updated package documentation.
+
+2009-08-13 (0.1-1)
+* First public release.
