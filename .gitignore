@@ -11,6 +11,7 @@ plot_harmonization/etc
 */input_data
 */output_data
 */temp_data
+*.xlsx
 *.shp
 *.csv
 *.tif
