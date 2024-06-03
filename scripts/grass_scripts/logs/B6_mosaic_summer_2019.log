@@ -1,9 +1,0 @@
-ERROR 4: `GRIDCELL_2501.tif' not recognized as a supported file format.
-ERROR 4: `GRIDCELL_316.tif' not recognized as a supported file format.
-ERROR 4: `GRIDCELL_354.tif' not recognized as a supported file format.
-ERROR 4: `GRIDCELL_381.tif' not recognized as a supported file format.
-ERROR 4: `GRIDCELL_385.tif' not recognized as a supported file format.
-ERROR 4: `B6_2019_summer_mosaic_ak_arctic' does not exist in the file system,
-and is not recognised as a supported dataset name.
-
-ERROR: Raster map <B6_2019_summer_mosaic_ak_arctic> not found

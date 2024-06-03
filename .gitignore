@@ -6,6 +6,12 @@ scripts/snap_esa/ASTER_Alaska_DEM.tif
 scripts/snap_esa/${targetFile}.*
 scripts/etc/s1_arctic_files.txt
 scripts/plot_harmonization/cshapes
+scripts/plot_harmonization/aggregate_plots.py
+plot_harmonization/etc
+*/input_data
+*/output_data
+*/temp_data
+*.shp
 *.csv
 *.tif
 *.ipynb_checkpoints*
