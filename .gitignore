@@ -14,3 +14,4 @@ plot_harmonization_old/
 *.ipynb_checkpoints*
 *__pycache__*
 *logs*
+plot_harmonization/aggregate_plots.py
