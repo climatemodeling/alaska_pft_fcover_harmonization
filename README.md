@@ -16,25 +16,50 @@ These notebooks were used to clean and standardize source tables (sources: ava, 
 3. **Read plot data into a pandas dataframe for tabular manipulation**
 
 4. **Extract existing auxiliary data and add columns we want to include**
-    - UID [int]: unique ID for every plot entry
-    - PlotID [sring]: non-unique plot identification code usually created by the original data authors
-    - Name [string]: code indicating the name of the database the plot data was stored on
-    - Citation [string]: citation for a plot's study (when published as a paper)
-    - AdminArea [string]: administrative area; locale indicating country, state/territories/provinces
-    - Date [datetime]: collection date in a standard UTC format
-    - Purpose [string]: data collection purpose
-    - BioClimZone [string]: 2019 CAVM bioclimate zone
-    - CoverScale [string]: cover scale like Braun-Blanquet that was used to indicate a range of fcover
-    - SampleMethod [string]: how surveyors collected fcover data
-    - GPSType [string]: the type of positioning system used to record plot centroids
-    - GPSAccuracy [float]: accuracy of the positioning system used (in meters)
-    - PlotSize [float]: the size of the plots (in radius)
-    - FireHistory [bool]: whether or not a fire occurred at the plot site
-    - Revisited [bool]: whether or not a plot site was revisted
-    - Crs [string]: EPSG code indicating the geographic coordinate reference system of lat/lon
-    - latitude [float]: Y coordinate
-    - longitude [float]: X coordinate
-    
+    - plotName [sring]: plot identification code usually created by the original data authors
+    - deciduousShrubCover [float]: fractional cover of deciduous shrubs
+	- deciduousTreeCover [float]: fractional cover of deciduous trees
+	- evergreenShrubCover [float]: fractional cover of evergreen shrubs
+	- evergreenTreeCover [float]: fractional cover of evergreen trees
+	- forbCover [float]: fractional cover of forbs
+	- graminoidCover [float]: fractional cover of graminoids
+	- nonvascularSumCover [float]: fractional cover of non-vascular
+	plants (bryophyteCover + lichenCover)
+	- bryophyteCover [float]: fractional cover of bryophytes
+	- lichenCover [float]: fractional cover of lichen
+	- litterCover [float]: fractional cover of litter
+	- waterCover [float]: fractional cover of water
+	- baregroundCover [float]: fractional cover of bare ground
+	- surveyYear [int]: year that survey was performed
+	- surveyMonth [int]: month that survey was performed
+	- surveyDay [int]: day that survey was performed
+	- plotRadius [float]: radius of a plot in meters
+	- latitudeY [float]: latitude coordinate
+	- longitudeX [float]: longitude coordinate
+	- georefSource [string]: type of device used to collect coordinates
+	- georefAccuracy [float]: accuracy of coordinates in meters
+    - coordEPSG [string]: coordinate system
+	- dataSubsource [string]: project in charge of data collection
+	- dataSource [string]: database code indicating where data was
+	accessed from
+	- surveyMethod [string]: the tactic employed for collecting field
+	data
+	- fcoverScale [string]: fractional cover unit used during field data
+	collection
+	- surveyPurpose [string]: short description for the end goal of the
+	project that funded data collection
+	- geometry [geometry]: point coordinates
+	- adminUnit [string]: state or province in which field data was
+	collected
+	- adminCountry [string]: country in which field data was collected
+	- fireYears [bool]: whether or not a fire occured where field data
+	was collected
+	- bioclimSubzone [int]: bioclimate subzone integer
+	- duplicatedCoords [bool]: whether or not the plot's coordinates
+	appear more than once in the database
+	- duplicatedDate [bool]: whether or not the plot's collection date
+	appears more than once in the database 
+
 <br>
 
 5. **Correct fcover values that, when converted to float, raise a data-type error**
