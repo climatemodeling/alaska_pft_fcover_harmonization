@@ -1,5 +1,5 @@
 # Python Jupyter Notebooks
-These notebooks were used to clean and standardize source tables (sources: ava, akveg, abr, neon, sp). These notebooks are published with the Fractional Cover Field Data Synthesis for Applications in Arctic Remote Sensing (in preparation). The goal of this work was to gather and harmonize plot data from disparate sources, with the end goal of using these plot data to train models that predict the plant fractional cover (PFT) for 8 PFTs: deciduous shrubs, evergreen shrubs, forbs, graminoids, litter, and non-vascular plants (broad category) including lichen and bryophytes (sub-categories). Thus, the data we used is limited to the scope of our study: arctic alaskan tundra within nine years of 2019 Sentinel-2 imagery.
+These notebooks were used to clean and standardize source tables (sources: ava, akveg, abr, neon, nga). These notebooks are published with the Synthesis of field-based fractional vegetation cover observations across Arctic Alaska (in preparation). The goal of this work was to gather and harmonize plot data from disparate sources, with the end goal of using these plot data to train models that predict the plant fractional cover (PFT) for 8 PFTs: deciduous shrubs, evergreen shrubs, forbs, graminoids, litter, and non-vascular plants (broad category) including lichen and bryophytes (sub-categories). Thus, the data we used is limited to the scope of our study: arctic alaskan tundra within nine years of 2019 Sentinel-2 imagery.
 
 ---
 ## General procedure:
@@ -16,48 +16,49 @@ These notebooks were used to clean and standardize source tables (sources: ava, 
 3. **Read plot data into a pandas dataframe for tabular manipulation**
 
 4. **Extract existing auxiliary data and add columns we want to include**
-    - plotName [sring]: plot identification code usually created by the original data authors
-    - deciduousShrubCover [float]: fractional cover of deciduous shrubs
-	- deciduousTreeCover [float]: fractional cover of deciduous trees
-	- evergreenShrubCover [float]: fractional cover of evergreen shrubs
-	- evergreenTreeCover [float]: fractional cover of evergreen trees
-	- forbCover [float]: fractional cover of forbs
-	- graminoidCover [float]: fractional cover of graminoids
-	- nonvascularSumCover [float]: fractional cover of non-vascular
+    - plot_name [sring]: plot identification code usually created by the original data authors
+    - deciduous_shrub_cover [float]: fractional cover of deciduous shrubs
+	- deciduous_tree_cover [float]: fractional cover of deciduous trees
+	- evergreen_shrub_cover [float]: fractional cover of evergreen shrubs
+	- evergreen_tree_cover [float]: fractional cover of evergreen trees
+	- forb_cover [float]: fractional cover of forbs
+	- graminoid_cover [float]: fractional cover of graminoids
+	- nonvascular_sum_cover [float]: fractional cover of non-vascular
 	plants (bryophyteCover + lichenCover)
-	- bryophyteCover [float]: fractional cover of bryophytes
-	- lichenCover [float]: fractional cover of lichen
-	- litterCover [float]: fractional cover of litter
-	- waterCover [float]: fractional cover of water
-	- baregroundCover [float]: fractional cover of bare ground
-	- surveyYear [int]: year that survey was performed
-	- surveyMonth [int]: month that survey was performed
-	- surveyDay [int]: day that survey was performed
-	- plotRadius [float]: radius of a plot in meters
-	- latitudeY [float]: latitude coordinate
-	- longitudeX [float]: longitude coordinate
-	- georefSource [string]: type of device used to collect coordinates
-	- georefAccuracy [float]: accuracy of coordinates in meters
-    - coordEPSG [string]: coordinate system
-	- dataSubsource [string]: project in charge of data collection
-	- dataSource [string]: database code indicating where data was
+	- bryophyte_cover [float]: fractional cover of bryophytes
+	- lichen_cover [float]: fractional cover of lichen
+	- litter_cover [float]: fractional cover of litter
+	- water_cover [float]: fractional cover of water
+	- bareground_cover [float]: fractional cover of bare ground
+	- other_cover [float]: fractional cover of miscellaneous "vegetation" like dead standing plants, algae, fungus, and cyanobacteria
+	- survey_year [int]: year that survey was performed
+	- survey_month [int]: month that survey was performed
+	- survey_day [int]: day that survey was performed
+	- plot_radius [float]: radius of a plot in meters
+	- latitude_y [float]: latitude coordinate
+	- longitude_x [float]: longitude coordinate
+	- georef_source [string]: type of device used to collect coordinates
+	- georef_accuracy [float]: accuracy of coordinates in meters
+    - coord_EPSG [string]: coordinate system
+	- data_subsource [string]: project in charge of data collection
+	- data_source [string]: database code indicating where data was
 	accessed from
-	- surveyMethod [string]: the tactic employed for collecting field
+	- survey_method [string]: the tactic employed for collecting field
 	data
-	- fcoverScale [string]: fractional cover unit used during field data
+	- fcover_scale [string]: fractional cover unit used during field data
 	collection
-	- surveyPurpose [string]: short description for the end goal of the
+	- survey_purpose [string]: short description for the end goal of the
 	project that funded data collection
 	- geometry [geometry]: point coordinates
-	- adminUnit [string]: state or province in which field data was
+	- admin_unit [string]: state or province in which field data was
 	collected
-	- adminCountry [string]: country in which field data was collected
+	- admin_country [string]: country in which field data was collected
 	- fireYears [bool]: whether or not a fire occured where field data
 	was collected
-	- bioclimSubzone [int]: bioclimate subzone integer
-	- duplicatedCoords [bool]: whether or not the plot's coordinates
+	- bioclim_subzone [int]: bioclimate subzone integer
+	- duplicated_coords [bool]: whether or not the plot's coordinates
 	appear more than once in the database
-	- duplicatedDate [bool]: whether or not the plot's collection date
+	- duplicated_date [bool]: whether or not the plot's collection date
 	appears more than once in the database 
 
 <br>
@@ -77,10 +78,10 @@ These notebooks were used to clean and standardize source tables (sources: ava, 
 
 8. **Join species names from the fcover data to the species name in the Leaf Habit Supplementary Table from Macander et al. (2020) to assign shrubby plants a leaf retention type (deciduous, evergreen)**
 
-9. **Export join species names and their associated accepted names**
+9. **Export join of species names and their associated accepted names**
 
 10. **Manually ID one accepted species name for each species name used in plot data tables**
 
-11. **Aggregate species-level fcover to PFT-level fcover by grouping species into their habits and summing**
+11. **Aggregate species-level fcover to PFT-level fcover by grouping species into their PFTs and summing**
 ---
 ---
