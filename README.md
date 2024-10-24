@@ -1,5 +1,8 @@
+# Alaska Artic Tundra Plant Functional Type (PFT) Fractional Cover Mapping
 # Python Jupyter Notebooks
 These notebooks were used to clean and standardize source tables (sources: ava, akveg, abr, neon, nga). These notebooks are published with the Synthesis of field-based fractional vegetation cover observations across Arctic Alaska (in preparation). The goal of this work was to gather and harmonize plot data from disparate sources, with the end goal of using these plot data to train models that predict the plant fractional cover (PFT) for 8 PFTs: deciduous shrubs, evergreen shrubs, forbs, graminoids, litter, and non-vascular plants (broad category) including lichen and bryophytes (sub-categories). Thus, the data we used is limited to the scope of our study: arctic alaskan tundra within nine years of 2019 Sentinel-2 imagery.
+
+**Contributors**: [Morgan Steckler](https://github.com/msteckle), [Tianqi Zhang](https://github.com/zhang1206), [Jitendra (Jitu) Kumar](https://github.com/jitendra-kumar)
 
 ---
 ## General procedure:
