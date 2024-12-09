@@ -1,90 +1,80 @@
-# Alaska Artic Tundra Plant Functional Type (PFT) Fractional Cover Mapping
-# Python Jupyter Notebooks
-These notebooks were used to clean and standardize source tables (sources: ava, akveg, abr, neon, nga). These notebooks are published with the Synthesis of field-based fractional vegetation cover observations across Arctic Alaska (in preparation). The goal of this work was to gather and harmonize plot data from disparate sources, with the end goal of using these plot data to train models that predict the plant fractional cover (PFT) for 8 PFTs: deciduous shrubs, evergreen shrubs, forbs, graminoids, litter, and non-vascular plants (broad category) including lichen and bryophytes (sub-categories). Thus, the data we used is limited to the scope of our study: arctic alaskan tundra within nine years of 2019 Sentinel-2 imagery.
-
+# Overview: Pan-Arctic Vegetation Cover (PAVC) Database
 **Contributors**: [Morgan Steckler](https://github.com/msteckle), [Tianqi Zhang](https://github.com/zhang1206), [Jitendra (Jitu) Kumar](https://github.com/jitendra-kumar)
 
+This repository contains the jupyter notebooks (and supporting python modules) used to synthesize species and plant functional type (PFT) vegetation cover into one comprehensive database: PAVC. Version 1.0 of the database includes plot data from:
+
+- the Arctic Vegetation Archive of Alaska (AVA),
+- the Alaska Vegetation (AKVEG) database,
+- Alaska Biological Research (ABR) data associated with Macander et al. (2017),
+- the National Ecological Observation Network,
+- and previously unpublished Seward Peninsula data from the Next Generation Ecosystem Experiments: Arctic (NGA).
+
+# Contribution: How can you improve the database?
+
+These detailed Jupyter notebooks and helper functions were designed to streamline the process of synthesizing new datasets. Once tables have been formatted correctly, a new jupyter notebook can be written to synthesize data according to our standards. Notebooks provide detailed instructions and notes on how the data were pre-processed and synthesized using both automated and manual steps. If you come across issues in the notebooks, modules, or data, please publish an issue in this Github. We also welcome feedback and suggestions. We are always on the hunt for new data, so if you know of a dataset that isn't yet in the database that you'd like to see synthesized, please let us know!
+
+## Issue Tags:
+- New Dataset
+- Suggestion
+- Bug
+
+<br>
+
+# Generalized Synthesis Steps
+If you would like to try synthesizing a dataset for input into our database, take a look at the general procedure outlined below. We suggest following each code block in our Jupyter notebooks. You'll notice the steps are very similar across all notebooks.
+
 ---
-## General procedure:
+## Pre-processing procedure:
+First, ensure that the dataset you want to synthesize meets the bare minimum requirements for inclusion in the database:
+- Cover is measured at the species-level
+- Cover is measured as absolute cover, the proportion of the plot's area covered by vegetation spread across all heights in the plant community (can sum to over 100 percent)
+- Non-vegetation cover is available as top cover, the proportion of the plot's area covered by vegetation in only the top layer of the plant community (it should always sum to 100 percent)
+	- Water
+ 	- Bare Ground (bare soil, bare ground, rock, etc.)
+- Information about the plot's location, survey methods, authors, etc. are accessible
 
-1. **Visually inspect and clean tables before standardization**
-    - Rows: species names
-    - Columns: plot IDs
-    - Cell values: fcover
-
-<br>
-
-2. **Select plot data that were collected after 2010 and that are in the alaskan tundra**
-
-3. **Read plot data into a pandas dataframe for tabular manipulation**
-
-4. **Extract existing auxiliary data and add columns we want to include**
-    - plot_name [sring]: plot identification code usually created by the original data authors
-    - deciduous_shrub_cover [float]: fractional cover of deciduous shrubs
-	- deciduous_tree_cover [float]: fractional cover of deciduous trees
-	- evergreen_shrub_cover [float]: fractional cover of evergreen shrubs
-	- evergreen_tree_cover [float]: fractional cover of evergreen trees
-	- forb_cover [float]: fractional cover of forbs
-	- graminoid_cover [float]: fractional cover of graminoids
-	- nonvascular_sum_cover [float]: fractional cover of non-vascular
-	plants (bryophyteCover + lichenCover)
-	- bryophyte_cover [float]: fractional cover of bryophytes
-	- lichen_cover [float]: fractional cover of lichen
-	- litter_cover [float]: fractional cover of litter
-	- water_cover [float]: fractional cover of water
-	- bareground_cover [float]: fractional cover of bare ground
-	- other_cover [float]: fractional cover of miscellaneous "vegetation" like dead standing plants, algae, fungus, and cyanobacteria
-	- survey_year [int]: year that survey was performed
-	- survey_month [int]: month that survey was performed
-	- survey_day [int]: day that survey was performed
-	- plot_radius [float]: radius of a plot in meters
-	- latitude_y [float]: latitude coordinate
-	- longitude_x [float]: longitude coordinate
-	- georef_source [string]: type of device used to collect coordinates
-	- georef_accuracy [float]: accuracy of coordinates in meters
-    - coord_EPSG [string]: coordinate system
-	- data_subsource [string]: project in charge of data collection
-	- data_source [string]: database code indicating where data was
-	accessed from
-	- survey_method [string]: the tactic employed for collecting field
-	data
-	- fcover_scale [string]: fractional cover unit used during field data
-	collection
-	- survey_purpose [string]: short description for the end goal of the
-	project that funded data collection
-	- geometry [geometry]: point coordinates
-	- admin_unit [string]: state or province in which field data was
-	collected
-	- admin_country [string]: country in which field data was collected
-	- fireYears [bool]: whether or not a fire occured where field data
-	was collected
-	- bioclim_subzone [int]: bioclimate subzone integer
-	- duplicated_coords [bool]: whether or not the plot's coordinates
-	appear more than once in the database
-	- duplicated_date [bool]: whether or not the plot's collection date
-	appears more than once in the database 
+1. **Visually inspect, clean, and format cover tables before standardization**
+    - Rows should be species names (without author if possible)
+    - Column headers should be _unique_ plot IDs (ensure uniqueness!!!)
+    - Cell values should be the cover
+    - There should be no extra blank columns or rows, nor extra column/row labels
+    - Encoded as 'utf-8-sig' in Python
 
 <br>
 
-5. **Correct fcover values that, when converted to float, raise a data-type error**
+2. **Gather plot-level and survey-level auxiliary information**
+We categorize our auxiliary information as temporal, spatial, contextual, and geo-contextual. Below are the auxiliary plot information that contributors should assemble when synthesizing a dataset according to PAVC.
+![PFT_database_visual (1)](https://github.com/user-attachments/assets/048f8d3a-fb6e-43c5-8264-b57a1eaa6261)
+
+3. **Correct cover values that, when converted to float, raise a data-type error**
     - For example, "Trace" was sometimes used instead of 0.01
-    - Random letters or special characters with no meaning
+    - Human error
     
 <br>
 
-6. **Standardize fcover to a fraction (percent)**
-    - Older plots used Braun-Blanquet or Westoff codes that indicate a range of fcover; the mid-point percentage was used for these
+4. **If applicable, convert 0.0 cover to a trace value like 0.01.**
+Some datasets indicate trace with a small percent, with the text 'Trace', 'T', etc. Some datasets include 0 cover to mean that a species was present in the plot but at very trace amounts. In our database, we standardize trace by assigning a small value like 0.01 to the 0 cover values if applicable.
+
+5. **Ensure cover is represented as a percent**
+    - Older plots used Braun-Blanquet or Westoff oridnal codes that indicate a range of cover; the mid-point percentage was used as the representative percent cover value
+    - If working with ordinal cover codes, ensure you know the percentage ranges that represent each code---this can vary from project to project.
     
 <br>
 
-7. **Join the species names from the fcover data to the species name in the AKVEG Species Checklist to identify potential habits and accepted species names**
+## Species and PFT standardization procedure:
+6. **Join the species names from your cover table to the species name in the AKVEG Species Checklist to identify potential habits and accepted species names**
+You'll be happy to know that we wrote a big 'ole function for this in our support python module. You should use that to match your table's species names to the AKVEG checklist.
 
-8. **Join species names from the fcover data to the species name in the Leaf Habit Supplementary Table from Macander et al. (2020) to assign shrubby plants a leaf retention type (deciduous, evergreen)**
+7. **Join the species names from your cover data to the species name in the Leaf Habit Supplementary Table from Macander et al. (2020) to assign shrubs/trees a leaf retention type (deciduous, evergreen)**
 
-9. **Export join of species names and their associated accepted names**
+9. **Export the join of species names, their associated "potential" accepted names, and growth habits**
+The list of potential accepted names is supposed to aid the user in assigning an accepted name. If there was no match between your species name and an AKVEG species name, you should consult with an expert to assign an accepted species name, author, and naming authority.
 
-10. **Manually ID one accepted species name for each species name used in plot data tables**
+11. **Manually ID one accepted species name for each of your dataset's species names**
+The manual species name adjudication process is the most time-consuming component of this project. The species names from your data table should be creafully assigned an accepted species name. You also should know the author of the species name, as well as the authority you referenced during accepted name assignment. You'll also need to assign whether the name you've chosen is at the family, genus, species, subspecies, variety, or type (functional type) level.
 
-11. **Aggregate species-level fcover to PFT-level fcover by grouping species into their PFTs and summing**
+12. **Aggregate species-level fcover to PFT-level fcover by grouping species into their PFTs and summing**
+We have specific PFT categories: lichen and bryophytes (sum = non-vascular), graminoid, deciduous shrub, evergreen shrub, deciduous tree, evergreen tree, and other; as well as litter, all represented as absolute foliar cover. Water and bare ground are also necessary, but they should be measured as top cover.
+
 ---
 ---
