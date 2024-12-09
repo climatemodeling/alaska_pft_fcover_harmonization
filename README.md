@@ -14,9 +14,12 @@ This repository contains the jupyter notebooks (and supporting python modules) u
 These detailed Jupyter notebooks and helper functions were designed to streamline the process of synthesizing new datasets. Once tables have been formatted correctly, a new jupyter notebook can be written to synthesize data according to our standards. Notebooks provide detailed instructions and notes on how the data were pre-processed and synthesized using both automated and manual steps. If you come across issues in the notebooks, modules, or data, please publish an issue in this Github. We also welcome feedback and suggestions. We are always on the hunt for new data, so if you know of a dataset that isn't yet in the database that you'd like to see synthesized, please let us know!
 
 ## Issue Tags:
-- New Dataset
-- Suggestion
-- Bug
+- `new dataset` (suggestion for a new dataset to add to PAVC)
+- `bug` (something isn't working or seems incorrect)
+- `documentation` (suggestions for improving documentation)
+- `duplicate` (this issue or pull request already exists)
+- `enhancement` (suggestions for improvement)
+- `question` (further information is requested)
 
 <br>
 
